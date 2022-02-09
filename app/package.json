@@ -39,5 +39,21 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/tanimon/liff-qr-code-scan.git"
+  },
+  "keywords": [
+    "LINE",
+    "LIFF",
+    "QR-code"
+  ],
+  "author": "tanimon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tanimon/liff-qr-code-scan/issues"
+  },
+  "homepage": "https://github.com/tanimon/liff-qr-code-scan#readme"
 }

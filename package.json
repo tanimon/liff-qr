@@ -1,0 +1,29 @@
+{
+  "name": "liff-qr-code-scan",
+  "version": "0.1.0",
+  "description": "A demo LIFF application to scan QR codes.",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test --workspaces"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/tanimon/liff-qr-code-scan.git"
+  },
+  "keywords": [
+    "LINE",
+    "LIFF",
+    "QR-code",
+    "CDK"
+  ],
+  "author": "tanimon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tanimon/liff-qr-code-scan/issues"
+  },
+  "homepage": "https://github.com/tanimon/liff-qr-code-scan#readme",
+  "workspaces": [
+    "app",
+    "cdk"
+  ]
+}
