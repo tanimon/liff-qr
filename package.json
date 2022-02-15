@@ -6,7 +6,8 @@
   "scripts": {
     "app:start": "npm start -w app",
     "app:build": "npm run build -w app",
-    "test": "npm test --workspaces"
+    "test": "npm test --workspaces",
+    "deploy": "npm run deploy -w backend"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,6 @@
   "homepage": "https://github.com/tanimon/liff-qr-code-scan#readme",
   "workspaces": [
     "app",
-    "cdk"
+    "backend"
   ]
 }
