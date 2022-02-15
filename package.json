@@ -4,6 +4,8 @@
   "description": "A demo LIFF application to scan QR codes.",
   "main": "index.js",
   "scripts": {
+    "app:start": "npm start -w app",
+    "app:build": "npm run build -w app",
     "test": "npm test --workspaces"
   },
   "repository": {
