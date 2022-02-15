@@ -1,72 +1,74 @@
-import * as cloudfront from '@aws-cdk/aws-cloudfront';
-import * as iam from '@aws-cdk/aws-iam';
-import * as s3 from '@aws-cdk/aws-s3';
-import * as cdk from '@aws-cdk/core';
+import * as cdk from 'aws-cdk-lib';
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import { Construct } from 'constructs';
 
-// Reference: https://dev.classmethod.jp/articles/s3-cloudfront-cdk-content-distribution/
+// Reference: https://dev.classmethod.jp/articles/aws-cdk-deploy-react/
 export class CdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Create Bucket
-    const myBucket = new s3.Bucket(this, 'my-bucket');
-
-    // Create OriginAccessIdentity
-    const oai = new cloudfront.OriginAccessIdentity(this, 'my-oai');
-
-    // Create Policy and attach to my-bucket
-    const myBucketPolicy = new iam.PolicyStatement({
-      effect: iam.Effect.ALLOW,
-      actions: ['s3:GetObject'],
-      principals: [
-        new iam.CanonicalUserPrincipal(
-          oai.cloudFrontOriginAccessIdentityS3CanonicalUserId
-        ),
-      ],
-      resources: [myBucket.bucketArn + '/*'],
+    const websiteBucket = new s3.Bucket(this, 'WebsiteBucket', {
+      websiteErrorDocument: 'index.html',
+      websiteIndexDocument: 'index.html',
     });
-    myBucket.addToResourcePolicy(myBucketPolicy);
 
-    // Create CloudFront WebDistribution
-    new cloudfront.CloudFrontWebDistribution(this, 'WebsiteDistribution', {
-      viewerCertificate: {
-        aliases: [],
-        props: {
-          cloudFrontDefaultCertificate: true,
-        },
-      },
-      priceClass: cloudfront.PriceClass.PRICE_CLASS_ALL,
-      originConfigs: [
-        {
-          s3OriginSource: {
-            s3BucketSource: myBucket,
-            originAccessIdentity: oai,
+    const websiteIdentity = new cloudfront.OriginAccessIdentity(
+      this,
+      'WebsiteIdentity'
+    );
+
+    const webSiteBucketPolicyStatement = new iam.PolicyStatement({
+      actions: ['s3:GetObject'],
+      effect: iam.Effect.ALLOW,
+      principals: [websiteIdentity.grantPrincipal],
+      resources: [`${websiteBucket.bucketArn}/*`],
+    });
+
+    websiteBucket.addToResourcePolicy(webSiteBucketPolicyStatement);
+
+    const websiteDistribution = new cloudfront.CloudFrontWebDistribution(
+      this,
+      'WebsiteDistribution',
+      {
+        errorConfigurations: [
+          {
+            errorCachingMinTtl: 300,
+            errorCode: 403,
+            responseCode: 200,
+            responsePagePath: '/index.html',
           },
-          behaviors: [
-            {
-              isDefaultBehavior: true,
-              minTtl: cdk.Duration.seconds(0),
-              maxTtl: cdk.Duration.days(365),
-              defaultTtl: cdk.Duration.days(1),
-              pathPattern: 'my-contents/*',
+          {
+            errorCachingMinTtl: 300,
+            errorCode: 404,
+            responseCode: 200,
+            responsePagePath: '/index.html',
+          },
+        ],
+        originConfigs: [
+          {
+            s3OriginSource: {
+              s3BucketSource: websiteBucket,
+              originAccessIdentity: websiteIdentity,
             },
-          ],
-        },
-      ],
-      errorConfigurations: [
-        {
-          errorCode: 403,
-          responsePagePath: '/index.html',
-          responseCode: 200,
-          errorCachingMinTtl: 0,
-        },
-        {
-          errorCode: 404,
-          responsePagePath: '/index.html',
-          responseCode: 200,
-          errorCachingMinTtl: 0,
-        },
-      ],
+            behaviors: [
+              {
+                isDefaultBehavior: true,
+              },
+            ],
+          },
+        ],
+        priceClass: cloudfront.PriceClass.PRICE_CLASS_ALL,
+      }
+    );
+
+    new s3deploy.BucketDeployment(this, 'WebsiteDeploy', {
+      sources: [s3deploy.Source.asset('../app/build')],
+      destinationBucket: websiteBucket,
+      distribution: websiteDistribution,
+      distributionPaths: ['/*'],
     });
   }
 }
