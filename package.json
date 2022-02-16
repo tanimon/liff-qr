@@ -6,7 +6,9 @@
   "scripts": {
     "app:start": "npm start -w app",
     "app:build": "npm run build -w app",
+    "backend:build": "npm run build -w backend",
     "test": "npm test --workspaces",
+    "predeploy": "npm run app:build && npm run backend:build",
     "deploy": "npm run deploy -w backend"
   },
   "repository": {
