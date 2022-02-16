@@ -1,23 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import liff from '@line/liff';
 
 function App() {
+  const [qrCodeData, setQrCodeData] = useState('');
+  const handleScan = () => {
+    liff.scanCodeV2().then((result) => {
+      setQrCodeData(result.value ?? '');
+    });
+  };
+
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <button onClick={handleScan}>Scan QR Code</button>
+        <p>{qrCodeData}</p>
       </header>
     </div>
   );
